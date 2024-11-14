@@ -1,14 +1,23 @@
 import React from "react";
 import { Col, Form, Row } from "antd";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
+  const navigate = useNavigate();
   const onFinish = (values) => {};
 
   return (
     <div className="m-5">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl">PAYPILOT - REGISTER</h1>
-        <h1 className="text-sm underline">Already a member, Log In</h1>
+        <h1
+          className="text-sm underline"
+          onClick={() => {
+            navigate("/login");
+          }}
+        >
+          Already a member, Log In
+        </h1>
       </div>
       <hr />
       <Form layout="vertical" onFinish={onFinish}>
