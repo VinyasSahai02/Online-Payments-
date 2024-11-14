@@ -14,6 +14,9 @@
 .w-100{
     width:100%;
 }
+.w-400{
+    width: 400px;
+}
 
 .flex{
     display: flex;
@@ -62,6 +65,10 @@
 }
 .m-5{
     margin: 50px;
+}
+
+.mt-2{
+    margin-top: 20px;
 }
 .p-1{
     padding: 10px;
