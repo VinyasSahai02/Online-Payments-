@@ -1,10 +1,24 @@
 import React from "react";
-import { Col, Form, Row } from "antd";
+import { Col, Form, message, Row } from "antd";
 import { useNavigate } from "react-router-dom";
+import { RegisterUser } from "../../apicalls/users";
 
 function Register() {
   const navigate = useNavigate();
-  const onFinish = (values) => {};
+  const onFinish = async (values) => {
+    try {
+      const response = await RegisterUser(values);
+      if (response.success) {
+        message.success(response.message);
+        navigate("/login");
+      }
+      else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      message.error(error.message);
+    }
+  };
 
   return (
     <div className="m-5">
@@ -38,7 +52,7 @@ function Register() {
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item label="Mobile" name="mobileNumber">
+            <Form.Item label="Mobile" name="phoneNumber">
               <input type="text" />
             </Form.Item>
           </Col>
