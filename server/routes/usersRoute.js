@@ -2,6 +2,7 @@ const router = require("express").Router();
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 // Register a new user
 router.post("/register", async (req, res) => {
@@ -36,31 +37,37 @@ router.post("/register", async (req, res) => {
 // Login a user
 router.post("/login", async (req, res) => {
     try {
-        // Check if the user exists
-        const user = await User.findOne({ email: req.body.email });
-        if (!user) {
-            return res.send({
-                message: "User dose not exist",
-                success: false,
-            });
-        }
-
-        // Check if the password is correct
-        const validPassword = await bcrypt.compare(req.body.password, user.password);
-        if (!validPassword) {
-            return res.send({
-                message: "Invalid password",
-                success: false,
-            });
-        }
-
-        // Generate a token
-        const token = jwt.sign({ userId: user._id }, process.env.jwt_secret, { expiresIn: "1d" });
-        res.send({
-            message: "Login successful",
-            data: token,
-            success: true,
+      // Check if the user exists
+      const user = await User.findOne({ email: req.body.email });
+      if (!user) {
+        return res.send({
+          message: "User dose not exist",
+          success: false,
         });
+      }
+
+      // Check if the password is correct
+      const validPassword = await bcrypt.compare(
+        req.body.password,
+        user.password
+      );
+      if (!validPassword) {
+        return res.send({
+          message: "Invalid password",
+          success: false,
+        });
+      }
+
+      // Generate a token
+      // { userId: user._id } means we are encrypting the user id
+      const token = jwt.sign({ userId: user._id }, process.env.jwt_secret, {
+        expiresIn: "1d",
+      });
+      res.send({
+        message: "Login successful",
+        data: token,
+        success: true,
+      });
     } catch (err) {
         res.send({
             message: err.message,
@@ -69,4 +76,23 @@ router.post("/login", async (req, res) => {
     }
 });
 
+//get user info
+router.post("/get-user-info", authMiddleware ,async (req, res) => {
+  //before getting info from the token we need to decrypt the token
+  // for this we runa middleware before try catch
+  try {
+    const user = await User.findById(req.body.userId);
+    user.password =''
+    res.send({
+      message: "User info fetched successfully",
+      data: user,
+      success: true,
+    });
+  } catch (error) {
+    res.send({
+      message: error.message,
+      success: false,
+    });
+  }
+})
 module.exports = router;
